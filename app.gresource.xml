@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/app">
+    <file preprocess="xml-stripblanks">app.ui</file>
+    <file preprocess="xml-stripblanks">login.ui</file>
+  </gresource>
+</gresources>
