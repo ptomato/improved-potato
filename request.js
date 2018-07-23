@@ -4,7 +4,7 @@ const {Soup} = imports.gi;
 const ByteArray = imports.byteArray;
 
 class RequestError extends Error {
-    constructor(statusCode, response) {
+    constructor(statusCode, response, responseHeaders = {}) {
         let message = response;
         if (typeof response === 'object') {
             if ('error_description' in response)
@@ -17,6 +17,8 @@ class RequestError extends Error {
         super(message);
         this.code = statusCode;
         this.response = response;
+        this.headers = {};
+        responseHeaders.foreach((key, value) => (this.headers[key] = value));
     }
 }
 
@@ -49,7 +51,7 @@ function request(session, method, url, jsonBody = null, headers = {}) {
             }
 
             if (m.statusCode !== 200) {
-                reject(new RequestError(m.statusCode, response));
+                reject(new RequestError(m.statusCode, response, m.responseHeaders));
                 return;
             }
             resolve(response);
