@@ -65,7 +65,6 @@ rules:
     - 4
     - MemberExpression: 'off'
   indent-legacy: error
-  init-declarations: error
   key-spacing: error
   keyword-spacing:
     - error
@@ -102,7 +101,11 @@ rules:
   no-extend-native: error
   no-extra-bind: error
   no-extra-label: error
-  no-extra-parens: error
+  no-extra-parens:
+    - error
+    - all
+    - conditionalAssign: false
+      returnAssign: false
   no-floating-decimal: error
   no-invalid-this: error
   no-iterator: error
@@ -168,9 +171,10 @@ rules:
   nonblock-statement-body-position:
     - error
     - below
-  object-curly-newline: 'off'
+  object-curly-newline:
+    - error
+    - consistent: true
   object-curly-spacing: error
-  object-property-newline: error
   object-shorthand: 'off'
   operator-assignment: error
   operator-linebreak: error
