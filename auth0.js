@@ -42,7 +42,12 @@ class Login {
             await this._authenticate(username, password);
             dialog.loginSucceeded();
         } catch (err) {
-            dialog.loginFailed(err);
+            let message;
+            if ('response' in err)
+                message = err.response.error_description;
+            else
+                logError(err);
+            dialog.loginFailed(message);
         }
     }
 
@@ -52,7 +57,22 @@ class Login {
             await this._authenticate(username, password);
             dialog.createAccountSucceeded();
         } catch (err) {
-            dialog.createAccountFailed(err);
+            let message;
+            if ('response' in err) {
+                if ('error_description' in err.response) {
+                    message = err.response.error_description;
+                } else if ('error' in err.response) {
+                    message = err.response.error;
+                    message = `${message[0].toUpperCase()}${message.slice(1)}.`;
+                } else if ('message' in err.response) {
+                    message = `${err.response.message}.`;
+                } else {
+                    logError(err);
+                }
+            } else {
+                logError(err);
+            }
+            dialog.createAccountFailed(message);
         }
     }
 

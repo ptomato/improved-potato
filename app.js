@@ -66,13 +66,8 @@ var LoginWindow = GObject.registerClass({
         this.emit('create-account', username, password);
     }
 
-    loginFailed(err) {
-        let message = 'Failed to log in.';
-        if ('response' in err)
-            message = err.response.error_description;
-        else
-            logError(err);
-
+    loginFailed(description) {
+        const message = description || 'Failed to log in.';
         this._login_username.text = '';
         this._login_password.text = '';
         this._login.sensitive = true;
@@ -84,25 +79,8 @@ var LoginWindow = GObject.registerClass({
         this.destroy();
     }
 
-    createAccountFailed(err) {
-        let message = 'Failed to create account.';
-        print(Object.keys(err));
-        print(Object.keys(err.response));
-        if ('response' in err) {
-            if ('error_description' in err.response) {
-                message = err.response.error_description;
-            } else if ('error' in err.response) {
-                message = err.response.error;
-                message = `${message[0].toUpperCase()}${message.slice(1)}.`;
-            } else if ('message' in err.response) {
-                message = `${err.response.message}.`;
-            } else {
-                logError(err);
-            }
-        } else {
-            logError(err);
-        }
-
+    createAccountFailed(description) {
+        const message = description || 'Failed to create account.';
         this._account_username.text = '';
         this._account_password.text = '';
         this._account_create.sensitive = true;
