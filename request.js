@@ -22,14 +22,16 @@ class RequestError extends Error {
     }
 }
 
-function request(session, method, url, jsonBody = null, headers = {}) {
+function request(session, method, url, jsonBody = null, headers = {}, options = {}) {
+    const jsonType = options.jsonType || 'application/json';
+
     const msg = new Soup.Message({
         method,
         uri: Soup.URI.new(url),
     });
 
     if (jsonBody) {
-        msg.requestHeaders.set_content_type('application/json', {});
+        msg.requestHeaders.set_content_type(jsonType, {});
         msg.requestBody.append(ByteArray.fromString(JSON.stringify(jsonBody)));
     }
 
