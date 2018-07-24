@@ -24,6 +24,7 @@ class RequestError extends Error {
 
 function request(session, method, url, jsonBody = null, headers = {}, options = {}) {
     const jsonType = options.jsonType || 'application/json';
+    const debug = options.debug || false;
 
     const msg = new Soup.Message({
         method,
@@ -38,6 +39,14 @@ function request(session, method, url, jsonBody = null, headers = {}, options = 
     Object.entries(headers).forEach(([key, value]) =>
         msg.requestHeaders.append(key, value));
 
+    if (debug) {
+        print('--->');
+        print(`URL: ${url}`);
+        print(JSON.stringify(body, null, 2));
+        msg.requestHeaders.foreach((key, value) => print(`${key}=${value}`));
+        print('===>');
+    }
+
     return new Promise((resolve, reject) => {
         session.queue_message(msg, (s, m) => {
             const responseBytes = m.responseBody.flatten().get_data();
@@ -50,6 +59,14 @@ function request(session, method, url, jsonBody = null, headers = {}, options = 
                     throw e;
                 // ignore JSON parse errors and just return the response as a
                 // string, instead
+            }
+
+            if (debug) {
+                print('<---');
+                print(`Code: ${m.statusCode}`);
+                print(JSON.stringify(response, null, 2));
+                m.responseHeaders.foreach((key, value) => print(`${key}=${value}`));
+                print('<===');
             }
 
             if (m.statusCode !== 200) {
