@@ -13,3 +13,10 @@ cognito
 - `meson _build`
 - `ninja -C _build app.gresource`
 - `gjs cognito.js`
+
+okta
+----
+- Fill in the developer API key in okta.js
+- `meson _build`
+- `ninja -C _build app.gresource`
+- `gjs okta.js`
