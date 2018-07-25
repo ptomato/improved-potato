@@ -22,18 +22,33 @@ class RequestError extends Error {
     }
 }
 
-function request(session, method, url, jsonBody = null, headers = {}, options = {}) {
+function request(session, method, url, body = null, headers = {}, options = {}) {
+    const urlencode = options.urlencode || false;
     const jsonType = options.jsonType || 'application/json';
     const debug = options.debug || false;
 
+    let realUrl = url;
+    if (body && urlencode) {
+        const params = Object.entries(body).map(([key, value]) => {
+            let strValue = value;
+            if (typeof value === 'object')
+                strValue = JSON.stringify(value);
+            return `${key}=${strValue}`;
+        });
+        realUrl += `?${params.join('&')}`;
+    }
     const msg = new Soup.Message({
         method,
-        uri: Soup.URI.new(url),
+        uri: Soup.URI.new(realUrl),
     });
 
-    if (jsonBody) {
-        msg.requestHeaders.set_content_type(jsonType, {});
-        msg.requestBody.append(ByteArray.fromString(JSON.stringify(jsonBody)));
+    if (body) {
+        if (urlencode) {
+            msg.requestHeaders.set_content_type('application/x-www-form-urlencoded', {});
+        } else {
+            msg.requestHeaders.set_content_type(jsonType, {});
+            msg.requestBody.append(ByteArray.fromString(JSON.stringify(body)));
+        }
     }
 
     Object.entries(headers).forEach(([key, value]) =>
@@ -41,7 +56,7 @@ function request(session, method, url, jsonBody = null, headers = {}, options = 
 
     if (debug) {
         print('--->');
-        print(`URL: ${url}`);
+        print(`URL: ${realUrl}`);
         print(JSON.stringify(body, null, 2));
         msg.requestHeaders.foreach((key, value) => print(`${key}=${value}`));
         print('===>');
